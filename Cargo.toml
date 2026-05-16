@@ -18,3 +18,8 @@ dylint_testing = "6.0.0"
 
 [package.metadata.rust-analyzer]
 rustc_private = true
+
+[workspace.metadata.dylint]
+libraries = [
+    { git = "https://github.com/manuelarte/funcorder-rs" },
+]
