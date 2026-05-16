@@ -27,15 +27,15 @@ Remove if none.
 struct MyStruct;
 
 impl MyStruct {
-    fn do_something_private(&self) {} // Bad: Private method before constructor
+    fn private_method(&self) {} // Bad: Private method before constructor
 
-    pub fn new() -> Self {
+    pub fn constructor() -> Self {
         MyStruct
     }
 
-    pub(crate) fn do_something_crate_private(&self) {} // Bad: Crate method before public
+    pub(crate) fn crate_method(&self) {} // Bad: Crate method before public
 
-    pub fn do_something_public(&self) {}
+    pub fn public_method(&self) {}
 }
 ```
 
@@ -45,15 +45,15 @@ Use instead:
 struct MyStruct;
 
 impl MyStruct {
-    pub fn new() -> Self {
+    pub fn constructor() -> Self {
         MyStruct
     }
 
-    pub fn do_something_public(&self) {}
+    pub fn public_method(&self) {}
 
-    pub(crate) fn do_something_crate_private(&self) {}
+    pub(crate) fn crate_method(&self) {}
 
-    fn do_something_private(&self) {}
+    fn private_method(&self) {}
 }
 ```
 

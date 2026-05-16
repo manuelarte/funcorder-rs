@@ -33,15 +33,15 @@ dylint_linting::declare_late_lint! {
     /// struct MyStruct;
     ///
     /// impl MyStruct {
-    ///     fn do_something_private(&self) {} // Bad: Private method before constructor
+    ///     fn private_method(&self) {} // Bad: Private method before constructor
     ///
-    ///     pub fn new() -> Self {
+    ///     pub fn constructor() -> Self {
     ///         MyStruct
     ///     }
     ///
-    ///     pub(crate) fn do_something_crate_private(&self) {} // Bad: Crate method before public
+    ///     pub(crate) fn crate_method(&self) {}
     ///
-    ///     pub fn do_something_public(&self) {}
+    ///     pub fn public_method(&self) {}
     /// }
     /// ```
     /// Use instead:
@@ -49,20 +49,21 @@ dylint_linting::declare_late_lint! {
     /// struct MyStruct;
     ///
     /// impl MyStruct {
-    ///     pub fn new() -> Self {
+    ///     pub fn constructor() -> Self {
     ///         MyStruct
     ///     }
     ///
-    ///     pub fn do_something_public(&self) {}
+    ///     pub fn public_method(&self) {}
     ///
-    ///     pub(crate) fn do_something_crate_private(&self) {}
+    ///     pub(crate) fn crate_method(&self) {}
     ///
-    ///     fn do_something_private(&self) {}
+    ///     fn private_method(&self) {}
     /// }
     /// ```
     pub FUNCORDER_RS,
     Warn,
-    "description goes here"
+    "Linter that checks that the constructor is declared before the struct's methods, \
+    and that the public functions are also declared before the private ones"
 }
 
 /// Defines the desired order of method categories.
