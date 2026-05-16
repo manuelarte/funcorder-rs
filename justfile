@@ -12,6 +12,7 @@ lint:
 
 tools:
     cargo install cargo-dylint dylint-link
+    rustup component add clippy
 
 # Run both test and lint
 check: test lint
