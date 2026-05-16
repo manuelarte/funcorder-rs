@@ -2,13 +2,13 @@
 
 A linter based on the Go Uber style guideline [Function Grouping And Ordering][uber-function].
 
-### What it does
+## What it does
 
 Checks that methods within an `impl` block are ordered consistently:
 constructors (`pub fn new() -> Self`) first, then public methods,
 and then private methods.
 
-### Why is this bad?
+## Why is this bad?
 
 Following a consistent order for methods within an `impl` block improves readability
 and maintainability. Constructors are often the entry point for creating instances
@@ -21,7 +21,7 @@ of methods by visibility further enhances code comprehension.
 Remove if none.
 -->
 
-### Example
+## Example
 
 ```rust
 struct MyStruct;
@@ -57,4 +57,19 @@ impl MyStruct {
 }
 ```
 
+## How to use it
+
+**funcorder-rs** is using [dylint][dylint]. Check in their GitHub page how to use it.
+
+For reference:
+
+```toml
+[workspace.metadata.dylint]
+libraries = [
+    { git = "https://github.com/manuelarte/funcorder-rs" },
+]
+```
+
+
+[dylint]: https://github.com/trailofbits/dylint/
 [uber-function]: https://github.com/uber-go/guide/blob/master/style.md#function-grouping-and-ordering
