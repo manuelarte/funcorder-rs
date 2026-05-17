@@ -33,7 +33,7 @@ impl MyStruct {
         MyStruct
     }
 
-    pub(crate) fn crate_method(&self) {} // Bad: Crate method before public
+    pub(crate) fn crate_method(&self) {}
 
     pub fn public_method(&self) {}
 }
