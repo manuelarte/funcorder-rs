@@ -62,8 +62,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub FUNCORDER_RS,
     Warn,
-    "Linter that checks that the constructor is declared before the struct's methods, \
-    and that the public functions are also declared before the private ones"
+    "Linter that checks the order of methods within an impl block (constructors, public, private)"
 }
 
 /// Defines the desired order of method categories.
