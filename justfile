@@ -16,4 +16,3 @@ tools:
 
 # Run both test and lint
 check: test lint
-
