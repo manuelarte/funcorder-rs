@@ -1,6 +1,6 @@
 # Run tests
 test:
-    cargo test
+    DYLINT_RUSTFLAGS="-D warnings" cargo test
 
 fmt:
     cargo fmt --all -- --check

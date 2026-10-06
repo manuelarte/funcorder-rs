@@ -1,8 +1,8 @@
 [package]
 name = "funcorder_rs"
 version = "0.1.0"
-authors = ["authors go here"]
-description = "description goes here"
+authors = ["Manuel Doncel Martos"]
+description = "A dylint linter that checks the order of methods within an impl block (constructors, public, private)"
 edition = "2024"
 publish = false
 
