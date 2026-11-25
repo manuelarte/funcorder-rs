@@ -66,6 +66,32 @@ impl E {
     }
 }
 
+struct GeneratedImpl;
+
+macro_rules! generated_impl {
+    () => {
+        impl GeneratedImpl {
+            fn private(&self) {}
+            pub fn public(&self) {}
+        }
+    };
+}
+
+generated_impl!();
+
+struct GeneratedMethod;
+
+macro_rules! generated_public_method {
+    () => {
+        pub fn public(&self) {}
+    };
+}
+
+impl GeneratedMethod {
+    fn private(&self) {}
+    generated_public_method!();
+}
+
 fn main() {
     let a = A::my_constructor();
     a.foo();

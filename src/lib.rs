@@ -120,6 +120,10 @@ impl<'tcx> LateLintPass<'tcx> for FuncorderRs {
     // https://doc.rust-lang.org/stable/nightly-rustc/rustc_lint/trait.LateLintPass.html
     fn check_item(&mut self, cx: &LateContext<'_>, item: &Item<'_>) {
         if let ItemKind::Impl(impl_block) = item.kind {
+            if item.span.from_expansion() {
+                return;
+            }
+
             // Only check inherent impl blocks (not trait implementations)
             if impl_block.of_trait.is_some() {
                 return;
@@ -136,6 +140,9 @@ impl<'tcx> LateLintPass<'tcx> for FuncorderRs {
 
             for &impl_item_id in impl_block.items {
                 let impl_item = cx.tcx.hir_impl_item(impl_item_id);
+                if impl_item.span.from_expansion() {
+                    continue;
+                }
 
                 // Only consider functions for ordering
                 if let ImplItemKind::Fn(ref sig, _) = impl_item.kind {
