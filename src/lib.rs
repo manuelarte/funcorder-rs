@@ -202,7 +202,7 @@ fn is_constructor<'tcx>(
     }
 
     // Check for Option<Self> or Option<struct type>
-    if ret_ty.is_diag_item(cx, sym::Option)
+    if (ret_ty.is_diag_item(cx, sym::Option) || ret_ty.is_diag_item(cx, sym::Result))
         && let Adt(_, args) = ret_ty.kind()
         && let Some(inner_ty) = args.first().and_then(|arg| arg.as_type())
         && inner_ty == self_ty
