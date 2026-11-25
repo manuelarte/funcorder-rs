@@ -126,7 +126,11 @@ impl<'tcx> LateLintPass<'tcx> for FuncorderRs {
             }
 
             // Get the `Self` type for the `impl` block
-            let self_ty = cx.tcx.type_of(item.owner_id).instantiate_identity();
+            let self_ty = cx
+                .tcx
+                .type_of(item.owner_id)
+                .instantiate_identity()
+                .skip_norm_wip();
 
             let mut last_category: Option<MethodMetadata> = None;
 
@@ -212,7 +216,7 @@ fn is_constructor<'tcx>(
 /// `input_has_self` checks whether the input parameters of a function contain the `self`
 /// parameter in any form.
 fn input_has_self(fn_sig: &FnSig<'_>) -> bool {
-    fn_sig.decl.implicit_self.has_implicit_self()
+    fn_sig.decl.implicit_self().has_implicit_self()
 }
 
 #[test]
