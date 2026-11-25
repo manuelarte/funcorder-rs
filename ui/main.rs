@@ -36,6 +36,18 @@ impl C {
     }
 }
 
+// Not using Self, but using the struct type directly, should still be considered a constructor
+struct D {
+}
+
+impl D {
+    pub fn foo(&self) {}
+
+    pub fn my_constructor() -> D {
+        D {}
+    }
+}
+
 fn main() {
     let a = A::my_constructor();
     a.foo();
