@@ -1,5 +1,5 @@
 error: methods are not ordered correctly: `Public(foo)` declared after `Private(fo)`
-  --> $DIR/main.rs:9:5
+  --> $DIR/main.rs:11:5
    |
 LL |     pub fn foo(&self) {}
    |     ^^^^^^^^^^^^^^^^^^^^
@@ -9,7 +9,7 @@ LL |     pub fn foo(&self) {}
    = help: to override `-D warnings` add `#[allow(funcorder_rs)]`
 
 error: methods are not ordered correctly: `Constructor(my_constructor)` declared after `Public(foo)`
-  --> $DIR/main.rs:12:5
+  --> $DIR/main.rs:14:5
    |
 LL | /     pub fn my_constructor() -> Self {
 LL | |         //~^ funcorder_rs
@@ -20,7 +20,7 @@ LL | |     }
    = help: reorder functions to be constructors, public, private
 
 error: methods are not ordered correctly: `Constructor(maybe_constructor)` declared after `Public(foo)`
-  --> $DIR/main.rs:33:5
+  --> $DIR/main.rs:39:5
    |
 LL | /     pub fn maybe_constructor() -> Option<Self> {
 LL | |         //~^ funcorder_rs
@@ -31,14 +31,26 @@ LL | |     }
    = help: reorder functions to be constructors, public, private
 
 error: methods are not ordered correctly: `Constructor(my_constructor)` declared after `Public(foo)`
-  --> $DIR/main.rs:46:5
+  --> $DIR/main.rs:51:5
    |
 LL | /     pub fn my_constructor() -> D {
+LL | |         //~^ funcorder_rs
 LL | |         D {}
 LL | |     }
    | |_____^
    |
    = help: reorder functions to be constructors, public, private
 
-error: aborting due to 4 previous errors
+error: methods are not ordered correctly: `Constructor(my_constructor)` declared after `Public(foo)`
+  --> $DIR/main.rs:63:5
+   |
+LL | /     pub fn my_constructor() -> Result<E, ()> {
+LL | |         //~^ funcorder_rs
+LL | |         Ok(E {})
+LL | |     }
+   | |_____^
+   |
+   = help: reorder functions to be constructors, public, private
+
+error: aborting due to 5 previous errors
 

@@ -1,6 +1,8 @@
 #![allow(unused)]
 
 struct A;
+
+// private first, then public, then constructors
 impl A {
     fn do_nothing() {}
 
@@ -16,6 +18,8 @@ impl A {
 }
 
 struct B;
+
+// Two constructors, both should be considered constructors
 impl B {
     pub fn my_constructor() -> Self {
         B
@@ -27,6 +31,8 @@ impl B {
 }
 
 struct C;
+
+// Option<Self> should be considered a constructor
 impl C {
     pub fn foo(&self) {}
 
@@ -36,15 +42,27 @@ impl C {
     }
 }
 
-// Not using Self, but using the struct type directly, should still be considered a constructor
-struct D {
-}
+struct D;
 
+// Not using Self, but using the struct type directly, should still be considered a constructor
 impl D {
     pub fn foo(&self) {}
 
     pub fn my_constructor() -> D {
+        //~^ funcorder_rs
         D {}
+    }
+}
+
+struct E;
+
+// Using Result<E>, should still be considered a constructor
+impl E {
+    pub fn foo(&self) {}
+
+    pub fn my_constructor() -> Result<E, ()> {
+        //~^ funcorder_rs
+        Ok(E {})
     }
 }
 
