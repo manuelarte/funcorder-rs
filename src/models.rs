@@ -1,23 +1,21 @@
-use std::fmt::Formatter;
-use clippy_utils::{return_ty, sym};
 use clippy_utils::res::MaybeDef;
+use clippy_utils::{return_ty, sym};
 use rustc_hir::{FnSig, OwnerId};
 use rustc_lint::LateContext;
 use rustc_middle::ty::{Adt, Ty, Visibility};
-use rustc_span::def_id::DefId;
+use rustc_span::{Symbol, def_id::DefId};
+use std::fmt::Formatter;
 
-/// Defines the desired order of method categories.
-/// Higher enum variants mean higher priority (should appear earlier).
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone)]
 pub(super) enum MethodKind {
     Constructor,
     Public,
-    Private,
+    Restricted,
 }
 
 pub(super) struct MethodMetadata {
     kind: MethodKind,
-    name: String,
+    name: Symbol,
 }
 
 impl MethodMetadata {
@@ -26,31 +24,35 @@ impl MethodMetadata {
         cx: &LateContext<'tcx>,
         impl_item_owner_id: OwnerId,
         self_ty: Ty<'tcx>,
-        fn_name: &str,
+        name: Symbol,
         visibility: Visibility<DefId>,
     ) -> Option<Self> {
         if is_constructor(fn_sig, cx, impl_item_owner_id, self_ty) {
             Some(Self {
                 kind: MethodKind::Constructor,
-                name: fn_name.to_string(),
+                name,
             })
         } else if input_has_self(fn_sig) && visibility.is_public() {
             Some(Self {
                 kind: MethodKind::Public,
-                name: fn_name.to_string(),
+                name,
             })
         } else if input_has_self(fn_sig) && !visibility.is_public() {
             Some(Self {
-                kind: MethodKind::Private,
-                name: fn_name.to_string(),
+                kind: MethodKind::Restricted,
+                name,
             })
         } else {
             None
         }
     }
 
-    pub(super) fn kind(&self) -> &MethodKind {
-        &self.kind
+    pub(super) fn priority(&self) -> u8 {
+        match self.kind {
+            MethodKind::Constructor => 0,
+            MethodKind::Public => 1,
+            MethodKind::Restricted => 2,
+        }
     }
 }
 
@@ -60,17 +62,16 @@ impl std::fmt::Display for MethodMetadata {
     }
 }
 
-/// `is_constructor` check whether the given function is a constructor.
-/// A constructor must:
-/// - Not have an implicit `self` parameter (&self or &mut self)
-/// - Return Self, the struct type, or Option<Self>/Option<struct type>
+/// Checks whether an associated function is constructor-like.
+///
+/// It must have no receiver and return the implementing type directly, as
+/// `Option<implementing type>`, or as the first type parameter of `Result`.
 fn is_constructor<'tcx>(
     fn_sig: &FnSig<'_>,
     cx: &LateContext<'tcx>,
     impl_item_owner_id: OwnerId,
     self_ty: Ty<'tcx>,
 ) -> bool {
-    // Check that the function doesn't take &self or &mut self
     if input_has_self(fn_sig) {
         return false;
     }
@@ -83,7 +84,7 @@ fn is_constructor<'tcx>(
         return true;
     }
 
-    // Check for Option<Self> or Option<struct type>
+    // Check for Option<Self> or Result<Self, _>.
     if (ret_ty.is_diag_item(cx, sym::Option) || ret_ty.is_diag_item(cx, sym::Result))
         && let Adt(_, args) = ret_ty.kind()
         && let Some(inner_ty) = args.first().and_then(|arg| arg.as_type())
@@ -95,8 +96,7 @@ fn is_constructor<'tcx>(
     false
 }
 
-/// `input_has_self` checks whether the input parameters of a function contain the `self`
-/// parameter in any form.
+/// Checks whether the function has a receiver (`self`, `&self`, `&mut self`, etc.).
 fn input_has_self(fn_sig: &FnSig<'_>) -> bool {
     fn_sig.decl.implicit_self().has_implicit_self()
 }

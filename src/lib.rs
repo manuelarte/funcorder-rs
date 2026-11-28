@@ -9,16 +9,16 @@ extern crate rustc_hir;
 extern crate rustc_middle;
 extern crate rustc_span;
 
+use crate::models::MethodMetadata;
 use clippy_utils::diagnostics::span_lint_and_help;
 use rustc_hir::{ImplItemKind, Item, ItemKind};
 use rustc_lint::{LateContext, LateLintPass};
-use crate::models::MethodMetadata;
 
 dylint_linting::declare_late_lint! {
     /// ### What it does
-    /// Checks that methods within an `impl` block are ordered consistently:
-    /// constructors (`pub fn new() -> Self`) first, then public methods,
-    /// and then private methods.
+    /// Checks non-macro-expanded methods in inherent `impl` blocks are ordered
+    /// consistently: constructor-like associated functions first, then public
+    /// receiver methods, and then restricted-visibility receiver methods.
     ///
     /// ### Why is this bad?
     /// Following a consistent order for methods within an `impl` block improves readability
@@ -31,7 +31,7 @@ dylint_linting::declare_late_lint! {
     /// struct MyStruct;
     ///
     /// impl MyStruct {
-    ///     fn private_method(&self) {} // Bad: Private method before constructor
+    ///     fn private_method(&self) {} // Bad: restricted method before constructor
     ///
     ///     pub fn constructor() -> Self {
     ///         MyStruct
@@ -60,7 +60,7 @@ dylint_linting::declare_late_lint! {
     /// ```
     pub FUNCORDER_RS,
     Warn,
-    "Linter that checks the order of methods within an impl block (constructors, public, private)"
+    "Linter that orders constructor-like functions, public methods, and restricted-visibility methods"
 }
 
 impl<'tcx> LateLintPass<'tcx> for FuncorderRs {
@@ -94,7 +94,7 @@ impl<'tcx> LateLintPass<'tcx> for FuncorderRs {
 
                 // Only consider functions for ordering
                 if let ImplItemKind::Fn(ref sig, _) = impl_item.kind {
-                    let fn_name = impl_item.ident.name.as_str();
+                    let name = impl_item.ident.name;
 
                     let visibility = cx.tcx.visibility(impl_item.owner_id.def_id);
 
@@ -103,16 +103,14 @@ impl<'tcx> LateLintPass<'tcx> for FuncorderRs {
                         cx,
                         impl_item.owner_id,
                         self_ty,
-                        fn_name,
+                        name,
                         visibility,
                     ) else {
                         continue;
                     };
 
                     if let Some(lc) = last_category
-                        // If the current method's category is "less than" (lower priority)
-                        // the last encountered category, then it's out of order.
-                        && current_category.kind() < lc.kind()
+                        && current_category.priority() < lc.priority()
                     {
                         let msg = format!(
                             "methods are not ordered correctly: `{current_category}` declared after `{lc}`"
@@ -123,7 +121,7 @@ impl<'tcx> LateLintPass<'tcx> for FuncorderRs {
                             impl_item.span,
                             msg,
                             None,
-                            "reorder functions to be constructors, public, private",
+                            "reorder functions to be constructors, public, restricted",
                         );
                     }
                     last_category = Some(current_category);

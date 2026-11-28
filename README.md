@@ -4,9 +4,9 @@ A linter based on the Go Uber style guideline [Function Grouping And Ordering][u
 
 ## What it does
 
-Checks that methods within an `impl` block are ordered consistently:
-constructors (`pub fn new() -> Self`) first, then public methods,
-and then private methods.
+Checks non-macro-expanded functions in inherent `impl` blocks, ordering
+constructor-like associated functions first, then public receiver methods,
+then restricted-visibility receiver methods.
 
 ## Why is this bad?
 
@@ -15,19 +15,13 @@ and maintainability. Constructors are often the entry point for creating instanc
 of a struct, so placing them first makes the API clearer. A logical grouping
 of methods by visibility further enhances code comprehension.
 
-<!--
-### Known problems
-
-Remove if none.
--->
-
 ## Example
 
 ```rust
 struct MyStruct;
 
 impl MyStruct {
-    fn private_method(&self) {} // Bad: Private method before constructor
+    fn private_method(&self) {} // Bad: restricted method before constructor
 
     pub fn constructor() -> Self {
         MyStruct
