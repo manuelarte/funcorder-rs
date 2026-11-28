@@ -9,19 +9,19 @@ use rustc_span::def_id::DefId;
 /// Defines the desired order of method categories.
 /// Higher enum variants mean higher priority (should appear earlier).
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
-pub(crate) enum MethodKind {
+pub(super) enum MethodKind {
     Constructor,
     Public,
     Private,
 }
 
-pub(crate) struct MethodMetadata {
+pub(super) struct MethodMetadata {
     kind: MethodKind,
     name: String,
 }
 
 impl MethodMetadata {
-    pub(crate) fn from<'tcx>(
+    pub(super) fn from<'tcx>(
         fn_sig: &FnSig<'_>,
         cx: &LateContext<'tcx>,
         impl_item_owner_id: OwnerId,
@@ -49,7 +49,7 @@ impl MethodMetadata {
         }
     }
 
-    pub(crate) fn kind(&self) -> &MethodKind {
+    pub(super) fn kind(&self) -> &MethodKind {
         &self.kind
     }
 }
