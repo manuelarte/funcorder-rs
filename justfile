@@ -11,8 +11,7 @@ lint:
     cargo dylint --all
 
 tools:
-    cargo install cargo-dylint dylint-link
-    rustup component add clippy
+    cargo install --locked --version 6.4.0 cargo-dylint dylint-link
 
 # Run both test and lint
 check: test lint
